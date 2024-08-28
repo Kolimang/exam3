@@ -50,8 +50,12 @@ This operation will draw a filled rectangle
 
 The draw zone is divided in rectangles that can contain one character each (because we are in a terminal...), we will call them pixel
 To make everything easier, we will use only the top left corner of the pixel to know if that pixel is in a rectangle or not
-A pixel with a top left corner with a distance bigger or equal than 1 from the border of a rectangle is not part of an empty rectangle 
-A pixel with a top left corner with a distance lower than 1 from the border of a rectangle is part of an empty rectangle.
+
+A pixel with a top left corner with a distance bigger or equal than 1 from the border of a rectangle 
+is not part of an empty rectangle 
+
+A pixel with a top left corner with a distance lower than 1 from the border of a rectangle 
+is part of an empty rectangle.
 
 You should look at the image while reading the next few lines. It represents a terminal. We've set a draw zone of WIDTH 5 and HEIGHT 3.
 We've wrote different character to help you understand the following explanations.
