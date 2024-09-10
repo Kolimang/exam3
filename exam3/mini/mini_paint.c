@@ -1,11 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   mini_paint.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jrichir <jrichir@student.s19.be>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/30 15:20:54 by jrichir           #+#    #+#             */
+/*   Updated: 2024/09/10 14:36:12 by jrichir          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h> //memset
-#include <math.h> //sqrtf
+#include <math.h>   //sqrtf
 
-typedef struct s_circle t_circle;
-typedef struct s_canvas t_canvas;
+typedef struct s_circle	t_circle;
+typedef struct s_canvas	t_canvas;
 
 struct s_circle
 {
@@ -40,7 +52,7 @@ void	free_img(char **img, int height)
 
 char	**set_img(t_canvas canvas)
 {
-	char	**img = canvas.img;
+	char	**img;
 	int		i;
 
 	img = malloc((canvas.h + 1) * sizeof(char *));
@@ -81,6 +93,8 @@ void	display(t_canvas canvas)
 	}
 }
 
+// if (diff <= -1.00 && circle.type == 'C') --> inside
+// if (diff > -1.00 && diff <= 0.00) --> border
 char	**addcircle(t_canvas canvas, t_circle circle)
 {
 	int		i;
@@ -95,9 +109,9 @@ char	**addcircle(t_canvas canvas, t_circle circle)
 		{
 			diff = dist((float)j, (float)i, circle.x, circle.y) - circle.radius;
 			if (diff <= -1.00 && circle.type == 'C')
-					canvas.img[i][j] = circle.symbol; // inside
-			if (diff > -1 && diff <= 0.00)
-				canvas.img[i][j] = circle.symbol; // border
+				canvas.img[i][j] = circle.symbol;
+			if (diff > -1.00 && diff <= 0.00)
+				canvas.img[i][j] = circle.symbol;
 			j++;
 		}
 		i++;

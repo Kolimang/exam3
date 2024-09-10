@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mini_paint.c                                       :+:      :+:    :+:   */
+/*   micro_paint.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jrichir <jrichir@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/30 15:20:54 by jrichir           #+#    #+#             */
-/*   Updated: 2024/08/30 15:29:25 by jrichir          ###   ########.fr       */
+/*   Updated: 2024/09/10 15:50:31 by jrichir          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h> //memset
-#include <math.h>   //sqrtf
 
-typedef struct s_circle	t_circle;
+typedef struct s_rect	t_rect;
 typedef struct s_canvas	t_canvas;
 
-struct s_circle
+struct s_rect
 {
 	char	type;
 	float	x;
 	float	y;
-	float	radius;
+	float	w;
+	float	h;
 	char	symbol;
 };
 
@@ -76,9 +76,11 @@ char	**set_img(t_canvas canvas)
 	return (img);
 }
 
-float	dist(float ax, float ay, float bx, float by)
+float	dist(float a, float b)
 {
-	return (sqrtf((ax - bx) * (ax - bx) + (ay - by) * (ay - by)));
+	if (a - b < 0.0000)
+		return ((a - b) * (-1));
+	return (a - b);
 }
 
 void	display(t_canvas canvas)
@@ -93,28 +95,27 @@ void	display(t_canvas canvas)
 	}
 }
 
-// if (diff <= -1.00 && circle.type == 'C') --> inside
-// if (diff > -1.00 && diff <= 0.00) --> border
-char	**addcircle(t_canvas canvas, t_circle circle)
+char	**addrect(t_canvas canvas, t_rect rect)
 {
-	int		i;
-	int		j;
-	float	diff;
+	int		x;
+	int		y;
 
-	i = 0;
-	while (i < canvas.h)
+	y = 0;
+	while (y < canvas.h)
 	{
-		j = 0;
-		while (j < canvas.w)
+		x = 0;
+		while (x < canvas.w)
 		{
-			diff = dist((float)j, (float)i, circle.x, circle.y) - circle.radius;
-			if (diff <= -1.00 && circle.type == 'C')
-				canvas.img[i][j] = circle.symbol;
-			if (diff > -1.00 && diff <= 0.00)
-				canvas.img[i][j] = circle.symbol;
-			j++;
+			if ((float)x >= rect.x && (float)x <= rect.x + rect.w && (float)y >= rect.y && (float)y <= rect.y + rect.h)
+			{
+				if (rect.type == 'R')
+					canvas.img[y][x] = rect.symbol;
+				else if (dist(x, rect.x) < 1 || dist(x, rect.x + rect.w) < 1 || dist(y, rect.y) < 1 || dist(y, rect.y + rect.h) < 1 )
+					canvas.img[y][x] = rect.symbol;
+			}
+			x++;
 		}
-		i++;
+		y++;
 	}
 	return (canvas.img);
 }
@@ -122,7 +123,7 @@ char	**addcircle(t_canvas canvas, t_circle circle)
 int	execute(FILE *file)
 {
 	t_canvas	canvas;
-	t_circle	circle;
+	t_rect		rect;
 	int			scan_ret;
 
 	scan_ret = fscanf(file, "%d %d %c\n", &canvas.w, &canvas.h, &canvas.bg);
@@ -131,15 +132,15 @@ int	execute(FILE *file)
 	canvas.img = set_img(canvas);
 	if (!canvas.img)
 		return (1);
-	scan_ret = fscanf(file, "%c %f %f %f %c\n", &circle.type, &circle.x, &circle.y, &circle.radius, &circle.symbol);
-	if (scan_ret != -1 && scan_ret != 5)
+	scan_ret = fscanf(file, "%c %f %f %f %f %c\n", &rect.type, &rect.x, &rect.y, &rect.w, &rect.h, &rect.symbol);
+	if (scan_ret != -1 && scan_ret != 6)
 		return (1);
-	while (scan_ret == 5)
+	while (scan_ret == 6)
 	{
-		if ((circle.type != 'c' && circle.type != 'C') || circle.radius <= 0.0)
+		if ((rect.type != 'r' && rect.type != 'R') || rect.w <= 0.0000 || rect.h <= 0.0000)
 			return (1);
-		canvas.img = addcircle(canvas, circle);
-		scan_ret = fscanf(file, "%c %f %f %f %c\n", &circle.type, &circle.x, &circle.y, &circle.radius, &circle.symbol);
+		canvas.img = addrect(canvas, rect);
+		scan_ret = fscanf(file, "%c %f %f %f %f %c\n", &rect.type, &rect.x, &rect.y, &rect.w, &rect.h, &rect.symbol);
 	}
 	if (scan_ret != -1)
 		return (1);
