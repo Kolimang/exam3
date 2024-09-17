@@ -1,5 +1,6 @@
 # Folders
 .vscode
+*.dSYM
 
 # Files
 .DS_Store
